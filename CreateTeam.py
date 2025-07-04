@@ -104,11 +104,7 @@ if st.button("🚀 Divide Teams") and st.session_state.players:
     if common_player:
         autoplay_audio("./drum.mp3")
         time.sleep(0.4)
-        st.markdown(f"""
-            <div style="margin-top: 20px;">
-                <h4>🧢 Common Player: <strong>{common_player}</strong> plays for both teams!</h4>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown(f"### 🧢 Common Player: `{common_player}` plays for **both teams**!")
 
 
 if st.button("🔄 Reset Players"):
