@@ -1,5 +1,7 @@
 import streamlit as st
 import random
+import base64
+import time
 
 st.set_page_config(page_title="Create Cricket Team", layout="centered")
 
@@ -39,6 +41,35 @@ if st.session_state.players:
 else:
     st.info("No players added yet.")
 
+def autoplay_audio(file_path: str):
+    with open(file_path, "rb") as f:
+        data = f.read()
+        b64 = base64.b64encode(data).decode()
+        md = f"""
+            <audio style="display:none;" controls autoplay="true">
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            </audio>
+            """
+        st.markdown(
+            md,
+            unsafe_allow_html=True,
+        )
+        
+def display_players_with_delay(team, prefix):
+    for player in team:
+        # Create a placeholder for each player (it will be updated one by one)
+        player_placeholder = st.empty()
+        
+        player = f"{prefix} {player}" 
+        # Display player with a delay
+        player_placeholder.text(player)
+        
+        autoplay_audio("./pop.mp3")
+        
+        # Introduce a delay (you can adjust this value to control the speed)
+        time.sleep(0.5)
+
+
 if st.button("🚀 Divide Teams") and st.session_state.players:
     players = st.session_state.players.copy()
     random.shuffle(players)
@@ -51,19 +82,34 @@ if st.button("🚀 Divide Teams") and st.session_state.players:
     team1 = players[:mid]
     team2 = players[mid:]
 
+    # if 'team1' not in st.session_state:
+    #     st.session_state.team1 = team1
+
+    # if 'team2' not in st.session_state:
+    #     st.session_state.team2 = team2
+
     st.markdown("## 🏏 Teams")
     col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("### 🟦 Team 1")
-        st.markdown('<div class="team-box">' + "<br>".join(f'🔹 <span class="player">{p}</span>' for p in team1) + "</div>", unsafe_allow_html=True)
+        # st.markdown('<div class="team-box">' + "<br>".join(f'🔹 <span class="player">{p}</span>' for p in team1) + "</div>", unsafe_allow_html=True)
+        display_players_with_delay(team1, "🔹")
 
     with col2:
         st.markdown("### 🟥 Team 2")
-        st.markdown('<div class="team-box">' + "<br>".join(f'🔸 <span class="player">{p}</span>' for p in team2) + "</div>", unsafe_allow_html=True)
+        # st.markdown('<div class="team-box">' + "<br>".join(f'🔸 <span class="player">{p}</span>' for p in team2) + "</div>", unsafe_allow_html=True)
+        display_players_with_delay(team2,"🔸")
 
     if common_player:
-        st.markdown(f"### 🧢 Common Player: `{common_player}` plays for **both teams**!")
+        autoplay_audio("./drum.mp3")
+        time.sleep(0.4)
+        st.markdown(f"""
+            <div style="margin-top: 20px;">
+                <h4>🧢 Common Player: <strong>{common_player}</strong> plays for both teams!</h4>
+            </div>
+        """, unsafe_allow_html=True)
+
 
 if st.button("🔄 Reset Players"):
     st.session_state.players = []
