@@ -1,0 +1,70 @@
+import streamlit as st
+import random
+
+st.set_page_config(page_title="Create Cricket Team", layout="centered")
+
+st.markdown("""
+    <style>
+        .team-box {
+            background-color: #f0f2f6;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .player {
+            font-size: 18px;
+            margin: 5px 0;
+            color: black;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("🏏 Create Cricket Team")
+
+st.markdown("Add player names one by one. When ready, click **Divide Teams** to get balanced teams!")
+
+# ---- SESSION STATE ----
+if 'players' not in st.session_state:
+    st.session_state.players = []
+
+with st.form("player_form", clear_on_submit=True):
+    name = st.text_input("Enter player name:")
+    submitted = st.form_submit_button("➕ Add Player")
+    if submitted and name.strip():
+        st.session_state.players.append(name.strip().title())
+
+if st.session_state.players:
+    st.markdown("### 👥 Player List:")
+    st.markdown(", ".join(f"`{p}`" for p in st.session_state.players))
+else:
+    st.info("No players added yet.")
+
+if st.button("🚀 Divide Teams") and st.session_state.players:
+    players = st.session_state.players.copy()
+    random.shuffle(players)
+
+    common_player = None
+    if len(players) % 2 == 1:
+        common_player = players.pop()
+
+    mid = len(players) // 2
+    team1 = players[:mid]
+    team2 = players[mid:]
+
+    st.markdown("## 🏏 Teams")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown("### 🟦 Team 1")
+        st.markdown('<div class="team-box">' + "<br>".join(f'🔹 <span class="player">{p}</span>' for p in team1) + "</div>", unsafe_allow_html=True)
+
+    with col2:
+        st.markdown("### 🟥 Team 2")
+        st.markdown('<div class="team-box">' + "<br>".join(f'🔸 <span class="player">{p}</span>' for p in team2) + "</div>", unsafe_allow_html=True)
+
+    if common_player:
+        st.markdown(f"### 🧢 Common Player: `{common_player}` plays for **both teams**!")
+
+if st.button("🔄 Reset Players"):
+    st.session_state.players = []
+    st.rerun()
