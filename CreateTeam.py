@@ -82,11 +82,11 @@ if st.button("🚀 Divide Teams") and st.session_state.players:
     team1 = players[:mid]
     team2 = players[mid:]
 
-    # if 'team1' not in st.session_state:
-    #     st.session_state.team1 = team1
+    if 'team1' not in st.session_state:
+        st.session_state.team1 = team1
 
-    # if 'team2' not in st.session_state:
-    #     st.session_state.team2 = team2
+    if 'team2' not in st.session_state:
+        st.session_state.team2 = team2
 
     st.markdown("## 🏏 Teams")
     col1, col2 = st.columns(2)
@@ -105,6 +105,40 @@ if st.button("🚀 Divide Teams") and st.session_state.players:
         autoplay_audio("./drum.mp3")
         time.sleep(0.4)
         st.markdown(f"### 🧢 Common Player: `{common_player}` plays for **both teams**!")
+    
+    countdown_placeholder = st.empty()
+    coin_toss_delay = 5
+    for i in range(coin_toss_delay, 0, -1):
+        countdown_placeholder.markdown(f"**Tossing the 🥎Coin in {i} seconds...**")
+        time.sleep(1)
+        countdown_placeholder.empty()
+    
+    st.markdown("---")
+    st.subheader("🥎Coin Tossed!")
+
+    # if 'coin_toss_result' not in st.session_state:
+    # toss_button = st.button("Toss Coin")
+
+    if st.session_state.team1 and st.session_state.team2:
+        autoplay_audio("./coin_flip.mp3")
+        
+        toss_dict = {"team1":0,"team2":0}
+        for _ in range(100):    
+            if random.choice(["team1", "team2"]) == "team1":
+                toss_dict["team1"] += 1 
+            else:
+                toss_dict["team2"] += 1
+        
+        toss_result = "🟦 Team 1" if toss_dict["team1"] > toss_dict["team2"] else "🟥 Team 2"
+
+        st.session_state.coin_toss_result = toss_result
+
+        time.sleep(1)
+        autoplay_audio("./coin_drop.mp3")
+        time.sleep(3.2)
+        st.success(f"🎉 {toss_result} won the toss.")
+        # else:
+        #     st.write(f"The coin toss result was: **{st.session_state.coin_toss_result}**")
 
 
 if st.button("🔄 Reset Players"):
